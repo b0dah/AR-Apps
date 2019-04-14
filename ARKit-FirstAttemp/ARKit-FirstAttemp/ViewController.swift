@@ -24,12 +24,15 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.showsStatistics = true
         
         // Create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.scn")!
+         let scene = SCNScene(named: "art.scnassets/car/untitled.scn")!       //let scene = SCNScene(named: "art.scnassets/ship.scn")!
         
         // Set the scene to the view
         sceneView.scene = scene
         
         //sceneView.debugOptions = [ARSCNDebugOptions.showWorldOrigin]
+        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints,
+                                  ARSCNDebugOptions.showWorldOrigin]
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
