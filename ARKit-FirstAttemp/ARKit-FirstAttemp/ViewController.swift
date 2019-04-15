@@ -58,24 +58,27 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
 
     // MARK: - ARSCNViewDelegate
-    func CreateFloor() -> SCNNode {
+    func CreateFloor(planeAnchor: ARPlaneAnchor) -> SCNNode {
         let node = SCNNode()
         
-        let geometry = SCNPlane(width: 1.0, height: 1.0)
+        let geometry = SCNPlane(width: CGFloat(planeAnchor.extent.x) ,
+                                height: CGFloat(planeAnchor.extent.z))
         node.geometry = geometry
         
-        node .eulerAngles.x = -Float.pi / 2
+        node.eulerAngles.x = -Float.pi / 2
         node.opacity = 0.25
         
         return node
     }
     
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+        
         guard let planeAnchor = anchor as? ARPlaneAnchor else {
             return
         }
         print("plane has been discovered !")
-        let floor = CreateFloor()
+        
+        let floor = CreateFloor(planeAnchor: planeAnchor)
         node.addChildNode(floor)
     }
 /*
