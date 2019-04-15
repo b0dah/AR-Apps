@@ -56,7 +56,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Pause the view's session
         sceneView.session.pause()
     }
-
+//===============================================================================================
     // MARK: - ARSCNViewDelegate
     func CreateFloor(planeAnchor: ARPlaneAnchor) -> SCNNode {
         let node = SCNNode()
@@ -71,15 +71,43 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         return node
     }
     
+    func createCar(planeAnchor: ARPlaneAnchor) -> SCNNode {
+        
+        let node = SCNScene(named: "art.scnassets/car/untitled.scn")!.rootNode//.clone()
+        
+        node.position = SCNVector3(planeAnchor.center.x, 0, planeAnchor.center.z)
+        
+        return node
+        
+    }
+    
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         
-        guard let planeAnchor = anchor as? ARPlaneAnchor else {
-            return
-        }
-        print("plane has been discovered !")
+        guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
         
         let floor = CreateFloor(planeAnchor: planeAnchor)
         node.addChildNode(floor)
+        
+        let car = createCar(planeAnchor: planeAnchor)
+        node.addChildNode(car)
+    }
+    
+    func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
+        
+        guard let planeAnchor = anchor as? ARPlaneAnchor
+            else { return }
+        
+        print("plane has been discovered !")
+        
+        for node in node.childNodes{
+            node.position = SCNVector3(planeAnchor.center.x, 0, planeAnchor.center.z)
+            
+            if let plane = node.geometry as? SCNPlane {
+                //planeNode.position = SCNVector3(planeAnchor.center.x, 0, planeAnchor.center.z)
+                plane.width = CGFloat(planeAnchor.extent.x)
+                plane.height = CGFloat(planeAnchor.extent.z)
+            }
+        }
     }
 /*
     // Override to create and configure nodes for anchors added to the view's session.
