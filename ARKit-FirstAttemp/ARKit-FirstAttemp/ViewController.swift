@@ -35,12 +35,17 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
     }
     
+    
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
-
+        
+        // Enable horizontal plane detection»
+        configuration.planeDetection = [.horizontal]
+        
         // Run the view's session
         sceneView.session.run(configuration)
     }
@@ -53,7 +58,26 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
 
     // MARK: - ARSCNViewDelegate
+    func CreateFloor() -> SCNNode {
+        let node = SCNNode()
+        
+        let geometry = SCNPlane(width: 1.0, height: 1.0)
+        node.geometry = geometry
+        
+        node .eulerAngles.x = -Float.pi / 2
+        node.opacity = 0.25
+        
+        return node
+    }
     
+    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+        guard let planeAnchor = anchor as? ARPlaneAnchor else {
+            return
+        }
+        print("plane has been discovered !")
+        let floor = CreateFloor()
+        node.addChildNode(floor)
+    }
 /*
     // Override to create and configure nodes for anchors added to the view's session.
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
