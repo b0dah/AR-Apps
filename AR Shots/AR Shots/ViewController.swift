@@ -11,17 +11,27 @@ import SceneKit
 import ARKit
 
 class ViewController: UIViewController, ARSCNViewDelegate {
+    
+    var hoopAdded = false
 
     @IBOutlet var sceneView: ARSCNView!
     
     @IBAction func screenTapped(_ sender: UITapGestureRecognizer) {
-        let touchLocation = sender.location(in: sceneView)
-        
-        let hitTestResult = sceneView.hitTest(touchLocation, types: [.existingPlane])
-        
-        if let result = hitTestResult.first {
-            print("Ray intersected a discovered plane!")
-            addHoop(result: result)
+        if !hoopAdded {
+            let touchLocation = sender.location(in: sceneView)
+            
+            let hitTestResult = sceneView.hitTest(touchLocation, types: [.existingPlane])
+            
+            if let result = hitTestResult.first {
+                print("Ray intersected a discovered plane!")
+                addHoop(result: result)
+                
+                hoopAdded = true
+                
+            }
+        }
+        else {
+            createBasketball()
         }
     }
     
@@ -40,6 +50,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Set the scene to the view
         //sceneView.scene = scene
+        
+        sceneView.autoenablesDefaultLighting = true
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -82,10 +94,34 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Place the node in the correct position
         let planePosition = result.worldTransform.columns.3
         hoopNode.position = SCNVector3(planePosition.x, planePosition.y, planePosition.z)
-            
+        
+        // Apply the correct physics body
+        hoopNode.physicsBody = SCNPhysicsBody(type: .static, shape: SCNPhysicsShape(node: hoopNode, options: [SCNPhysicsShape.Option.type : SCNPhysicsShape.ShapeType.concavePolyhedron]))
+        
         // Place the node to the scene
         sceneView.scene.rootNode.addChildNode(hoopNode)
         
+    }
+    
+    func createBasketball() {
+        guard let currentFrame = sceneView.session.currentFrame else {
+            return
+        }
+        
+        let ball = SCNNode(geometry: SCNSphere(radius: 0.25))
+        ball.geometry?.firstMaterial?.diffuse.contents = UIColor.orange
+        
+        let cameraTransform = SCNMatrix4(currentFrame.camera.transform)
+        ball.transform = cameraTransform
+        
+        let physicsBody = SCNPhysicsBody(type: .dynamic, shape: SCNPhysicsShape(node: ball, options: [SCNPhysicsShape.Option.collisionMargin: 0.01]))
+        ball.physicsBody = physicsBody
+        
+        let power = Float(10.0)
+        let force = SCNVector3(-cameraTransform.m31*power, -cameraTransform.m32*power, -cameraTransform.m33*power)
+        ball.physicsBody?.applyForce(force, asImpulse: true)
+        
+        sceneView.scene.rootNode.addChildNode(ball)
     }
     
    /* func createCover() -> SCNNode {
