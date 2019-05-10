@@ -108,7 +108,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, SCNPhysicsContactDele
     
     // MARK: - Game Functionality
     
-   /*func configureSession() {
+   func configureSession() {
         if ARWorldTrackingSessionConfiguration.isSupported { // Проверяет, поддерживает ли пользовательское устройство более точное ARWorldTrackingSessionConfiguration
          
             // Создание конфигурации сеанса
@@ -124,7 +124,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, SCNPhysicsContactDele
             // Запуск сеанса просмотра
             sceneView.session.run(configuration)
         }
-    }*/
+    }
     
     // добавляем новый квадрат
     func addNewCocoaheads() {
