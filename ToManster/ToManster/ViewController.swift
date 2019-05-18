@@ -37,7 +37,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, SCNPhysicsContactDele
         
         // Set the scene to the view
         sceneView.scene = scene
-        sceneView.scene.physicsWorld.contactDelegate = self //as? SCNPhysicsContactDelegate // ######
+        sceneView.scene.physicsWorld.contactDelegate = self 
+        sceneView.autoenablesDefaultLighting = true
         
         addNewMonster()
         
@@ -104,7 +105,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, SCNPhysicsContactDele
     
     @IBAction func screenTapped(_ sender: UITapGestureRecognizer) {
         
-        let bulletNode = Bullet()
+        let bulletNode = addNewBullet() //Bullet() // 
         
         // position node exactly to the user's position
         let (direction, position) = self.getUserVector()
@@ -124,9 +125,10 @@ class ViewController: UIViewController, ARSCNViewDelegate, SCNPhysicsContactDele
     
     // get direction and camera position of the user
     func getUserVector() -> (SCNVector3, SCNVector3) {
+        let power = Float(-4.0)
         if let frame = self.sceneView.session.currentFrame {
             let userMatrix = SCNMatrix4(frame.camera.transform)
-            let dir = SCNVector3(-1*userMatrix.m31, -1*userMatrix.m32, -1*userMatrix.m33)
+            let dir = SCNVector3(power*userMatrix.m31, power*userMatrix.m32, power*userMatrix.m33)
             let pos = SCNVector3(userMatrix.m41, userMatrix.m42, userMatrix.m43)
             
             return (dir, pos)
@@ -165,13 +167,54 @@ class ViewController: UIViewController, ARSCNViewDelegate, SCNPhysicsContactDele
     }
     
     func addNewMonster() {
-        let monsterNode = Monster()
+        //let monsterNode = Monster()
+        
+        ///%%%%%%%%%%%%%%%%%%%%%%
+        let monsterScene = SCNScene(named: "art.scnassets/dragon.scn")
+        
+        guard let monsterNode = monsterScene?.rootNode.childNode(withName: "DragonNode", recursively: false) else {
+            
+            fatalError("no such node with the name")
+        }
+        
+        monsterNode.physicsBody = SCNPhysicsBody(type: .dynamic, shape: SCNPhysicsShape(node: monsterNode,  options: [SCNPhysicsShape.Option.type : SCNPhysicsShape.ShapeType.convexHull]))
+        monsterNode.physicsBody?.isAffectedByGravity = false
+        
+        ///////////////////////////////
+        monsterNode.physicsBody?.categoryBitMask = CollisionCategory.monsters.rawValue
+        monsterNode.physicsBody?.contactTestBitMask = CollisionCategory.bullets.rawValue
+            ///////////////////////////////
+            
+        
+        //%%%%%%%%%%%%%%%%%%%%%%
         
         let posX = floatBetween(first: -0.9, second: 0.9)
         let posY = floatBetween(first: -0.9, second: 0.9)
         // two random coordinates and fixed distance to user
         monsterNode.position = SCNVector3(posX, posY, -1)
         sceneView.scene.rootNode.addChildNode(monsterNode)
+    }
+    
+    func addNewBullet()-> SCNNode {
+
+        let bulletScene = SCNScene(named: "art.scnassets/tomato.scn")
+
+        guard let bulletNode = bulletScene?.rootNode.childNode(withName: "TomatoNode", recursively: false) else {
+            
+            fatalError("no such node with the name")
+        }
+        
+        bulletNode.physicsBody = SCNPhysicsBody(type: .dynamic, shape: SCNPhysicsShape(node: bulletNode,  options: [SCNPhysicsShape.Option.type : SCNPhysicsShape.ShapeType.convexHull]))
+         //let physicsBody = SCNPhysicsBody(type: .dynamic, shape: SCNPhysicsShape(node: bulletNode, options: [SCNPhysicsShape.Option.collisionMargin: 0.01]))
+        //bulletNode.physicsBody = physicsBody
+        bulletNode.physicsBody?.isAffectedByGravity = false
+        
+        ///////////////////////////////
+        bulletNode.physicsBody?.categoryBitMask = CollisionCategory.bullets.rawValue
+        bulletNode.physicsBody?.contactTestBitMask = CollisionCategory.monsters.rawValue
+        ///////////////////////////////
+        
+        return bulletNode
     }
 }
 

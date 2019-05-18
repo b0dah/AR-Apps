@@ -13,12 +13,25 @@ class Bullet: SCNNode {
     override init() {
         super.init()
         
-        let sphere = SCNSphere(radius: 0.025)
+        let sphere = SCNSphere(radius: 0.15)
         self.geometry = sphere
         let shape = SCNPhysicsShape(geometry: sphere, options: nil)
         self.physicsBody = SCNPhysicsBody(type: .dynamic, shape: shape)
         self.physicsBody?.isAffectedByGravity = false
         
+        
+        
+        /*let tomatoScene = SCNScene(named: "tomato.scn")
+        guard let tomatoNode = tomatoScene?.rootNode.childNode(withName: "TomatoNode", recursively: false) else {
+            return
+        }
+        
+        //let tomatoShape = SCNPhysicsShape(geometry: (tomatoNode?.geometry)!, options: nil)
+        tomatoNode.physicsBody = SCNPhysicsBody(type: .dynamic, shape: SCNPhysicsShape(node: tomatoNode,  options: [SCNPhysicsShape.Option.type : SCNPhysicsShape.ShapeType.concavePolyhedron]))
+        
+        
+        tomatoNode.physicsBody?.isAffectedByGravity = false
+        */
         
         ///////////////////////////////
         //относится
@@ -28,8 +41,11 @@ class Bullet: SCNNode {
         ///////////////////////////////
         
         let material = SCNMaterial()
-        material.diffuse.contents = UIColor.orange // ???????
+        material.diffuse.contents = UIImage(named: "Bullet")//UIColor.orange
         self.geometry?.materials = [material]
+ 
+        
+        //self.addChildNode(tomatoNode)
     }
     
     

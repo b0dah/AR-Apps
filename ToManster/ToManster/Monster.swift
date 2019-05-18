@@ -13,7 +13,7 @@ class Monster: SCNNode {
     override init() {
         super.init()
         
-        let box = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0)
+        let box = SCNBox(width: 0.3, height: 0.3, length: 0.3, chamferRadius: 0)
         self.geometry = box
         
         let shape = SCNPhysicsShape(geometry: box, options: nil)
